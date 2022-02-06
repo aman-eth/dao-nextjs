@@ -112,6 +112,52 @@ export default function Home() {
     }
   };
 
+  const createProposal = async () => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const daoContract = getDAOContractInstance(signer);
+      const txn = await daoContract.createProposal(fakeNftTokenId);
+      setLoading(true);
+      await txn.wait();
+      await getNumProposalsInDAO();
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+      window.alert(e.message);
+    }
+  };
+
+  const voteOnProposal = async (proposalId, _vote) => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const daoContract = getDAOContractInstance(signer);
+      let vote = _vote === "YAY" ? 0 : 1;
+      const txn = await daoContract.voteOnProposal(proposalId, vote);
+      setLoading(true);
+      await txn.wait();
+      setLoading(false);
+      await fetchAllProposals();
+    } catch (e) {
+      console.table(e);
+      window.alert(e.message);
+    }
+  };
+
+  const executeProposal = async (proposalId) => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const daoContract = getDAOContractInstance(signer);
+      const txn = await daoContract.executeProposal(proposalId);
+      setLoading(true);
+      await txn.wait();
+      setLoading(false);
+      await fetchAllProposals();
+    } catch (e) {
+      console.log(e);
+      window.alert(e.message);
+    }
+  };
+
   const getDAOContractInstance = (providerOrSigner) => {
     return new Contract(
       CRYPTODEVS_DAO_CONTRACT_ADDRESS,
